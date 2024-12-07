@@ -23,6 +23,8 @@
 
 Anvil::InstanceCreateInfo::InstanceCreateInfo(const std::string&              in_app_name,
                                               const std::string&              in_engine_name,
+	                                          std::vector<std::string> &&in_layers,
+	                                          std::vector<LayerSetting> &&in_layer_settings,
                                               Anvil::DebugCallbackFunction    in_opt_validation_callback_proc,
                                               bool                            in_mt_safe,
                                               const std::vector<std::string>& in_opt_disallowed_instance_level_extensions)
@@ -32,6 +34,8 @@ Anvil::InstanceCreateInfo::InstanceCreateInfo(const std::string&              in
      m_disallowed_instance_level_extensions(in_opt_disallowed_instance_level_extensions),
      m_engine_name                         (in_engine_name),
      m_engine_version                      (0),
+	 m_layers                              (std::move(in_layers)),
+	 m_layer_settings                      (std::move(in_layer_settings)),
      m_is_mt_safe                          (in_mt_safe),
      m_n_memory_type_to_use_for_all_alocs  (UINT32_MAX),
      m_validation_callback                 (in_opt_validation_callback_proc)
@@ -41,6 +45,8 @@ Anvil::InstanceCreateInfo::InstanceCreateInfo(const std::string&              in
 
 Anvil::InstanceCreateInfoUniquePtr Anvil::InstanceCreateInfo::create(const std::string&              in_app_name,
                                                                      const std::string&              in_engine_name,
+																     std::vector<std::string> &&in_layers,
+	                                                                 std::vector<LayerSetting> &&in_layer_settings,
                                                                      Anvil::DebugCallbackFunction    in_opt_validation_callback_proc,
                                                                      bool                            in_mt_safe,
                                                                      const std::vector<std::string>& in_opt_disallowed_instance_level_extensions)
@@ -50,6 +56,8 @@ Anvil::InstanceCreateInfoUniquePtr Anvil::InstanceCreateInfo::create(const std::
     result_ptr.reset(
         new Anvil::InstanceCreateInfo(in_app_name,
                                       in_engine_name,
+			                          std::move(in_layers),
+								      std::move(in_layer_settings),
                                       in_opt_validation_callback_proc,
                                       in_mt_safe,
                                       in_opt_disallowed_instance_level_extensions)

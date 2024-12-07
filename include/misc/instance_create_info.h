@@ -30,6 +30,16 @@ namespace Anvil
     typedef std::function<void (Anvil::DebugMessageSeverityFlags in_severity,
                                 const char*                      in_message)> DebugCallbackFunction;
 
+	enum class LayerSettingType : uint32_t { Bool32 = 0, Int32, Int64, Uint32, Uint64, Float32, Float64, String };
+
+	struct LayerSetting {
+		const char *pLayerName;
+		const char *pSettingName;
+		LayerSettingType type;
+		uint32_t valueCount;
+		const void *pValues;
+	};
+
     class InstanceCreateInfo
     {
     public:
@@ -59,6 +69,8 @@ namespace Anvil
          **/
         static Anvil::InstanceCreateInfoUniquePtr create(const std::string&              in_app_name,
                                                          const std::string&              in_engine_name,
+			                                             std::vector<std::string> &&in_layers,
+                                                         std::vector<LayerSetting> &&in_layer_settings,
                                                          Anvil::DebugCallbackFunction    in_opt_validation_callback_proc,
                                                          bool                            in_mt_safe,
                                                          const std::vector<std::string>& in_opt_disallowed_instance_level_extensions = std::vector<std::string>() );
@@ -77,6 +89,10 @@ namespace Anvil
         {
             return m_app_version;
         }
+
+		const std::vector<LayerSetting> &get_layer_settings() const { return m_layer_settings; }
+
+		const std::vector<std::string> &get_layers() const { return m_layers; }
 
         const std::vector<std::string>& get_disallowed_instance_level_extensions() const
         {
@@ -167,6 +183,8 @@ namespace Anvil
         /* Private functions */
         InstanceCreateInfo(const std::string&              in_app_name,
                            const std::string&              in_engine_name,
+			               std::vector<std::string> &&in_layers,
+			               std::vector<LayerSetting> &&in_layer_settings,
                            Anvil::DebugCallbackFunction    in_opt_validation_callback_proc,
                            bool                            in_mt_safe,
                            const std::vector<std::string>& in_opt_disallowed_instance_level_extensions);
@@ -179,6 +197,8 @@ namespace Anvil
         std::vector<std::string>     m_disallowed_instance_level_extensions;
         std::string                  m_engine_name;
         uint32_t                     m_engine_version;
+		std::vector<std::string>     m_layers;
+		std::vector<LayerSetting>    m_layer_settings;
         bool                         m_is_mt_safe;
         uint32_t                     m_n_memory_type_to_use_for_all_alocs;
         Anvil::DebugCallbackFunction m_validation_callback;

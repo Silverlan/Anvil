@@ -30,7 +30,6 @@ static bool                    g_instance_func_ptrs_inited = false;
 static std::mutex              g_vk_func_ptr_init_mutex;
 static Anvil::LibraryUniquePtr g_vk_library_ptr;
 
-
 /** Please see header for specification */
 Anvil::Instance::Instance(Anvil::InstanceCreateInfoUniquePtr in_create_info_ptr)
     :MTSafetySupportProvider(in_create_info_ptr->is_mt_safe() ),
@@ -415,6 +414,7 @@ bool Anvil::Instance::init()
     uint32_t                    api_version_to_use                 = 0;
     std::vector<const char*>    enabled_extensions_raw;
     std::vector<const char*>    enabled_layers;
+	std::vector<VkLayerSettingEXT> layerSettings;
     std::map<std::string, bool> extension_enabled_status;
     bool                        is_device_group_creation_supported = true;
     size_t                      n_instance_layers                  = 0;
@@ -429,6 +429,21 @@ bool Anvil::Instance::init()
 
         goto end;
     }
+
+	enabled_layers.reserve(m_create_info_ptr->get_layers().size());
+	for(const auto &layer : m_create_info_ptr->get_layers())
+		enabled_layers.push_back(layer.c_str());
+
+	layerSettings.reserve(m_create_info_ptr->get_layer_settings().size());
+	for(const auto &setting : m_create_info_ptr->get_layer_settings()) {
+		VkLayerSettingEXT vkSetting;
+		vkSetting.pLayerName = setting.pLayerName;
+		vkSetting.pSettingName = setting.pSettingName;
+		vkSetting.valueCount = setting.valueCount;
+		vkSetting.type = static_cast<VkLayerSettingTypeEXT>(setting.type);
+		vkSetting.pValues = setting.pValues;
+		layerSettings.push_back(vkSetting);
+	}
 
     /* Enumerate available layers */
     enumerate_instance_layers();
@@ -668,11 +683,13 @@ bool Anvil::Instance::init()
         app_info.pNext              = nullptr;
         app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 
+		const VkLayerSettingsCreateInfoEXT layer_settings_create_info {VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT, nullptr, layerSettings.size(), layerSettings.data()};
+
         create_info.enabledExtensionCount   = static_cast<uint32_t>(enabled_extensions_raw.size() );
         create_info.enabledLayerCount       = static_cast<uint32_t>(enabled_layers.size        () );
         create_info.flags                   = 0;
         create_info.pApplicationInfo        = &app_info;
-        create_info.pNext                   = nullptr;
+		create_info.pNext = &layer_settings_create_info;
         create_info.ppEnabledExtensionNames = (enabled_extensions_raw.size() > 0) ? &enabled_extensions_raw.at(0) : nullptr;
         create_info.ppEnabledLayerNames     = (enabled_layers.size()         > 0) ? &enabled_layers.at        (0) : nullptr;
         create_info.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
