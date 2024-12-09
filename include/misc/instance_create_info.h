@@ -178,6 +178,8 @@ namespace Anvil
             m_is_mt_safe = in_is_mt_safe;
         }
 
+		const void *pNext = nullptr;
+
     private:
 
         /* Private functions */

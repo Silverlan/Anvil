@@ -125,8 +125,8 @@ void Anvil::BaseDevice::create_device(const std::vector<const char*>& in_extensi
             create_info.enabledExtensionCount   = static_cast<uint32_t>(in_extensions.size() );
             create_info.enabledLayerCount       = static_cast<uint32_t>(in_layers.size    () );
             create_info.flags                   = 0;
-            create_info.pEnabledFeatures        = nullptr; /* chained */
             create_info.pNext                   = nullptr;
+            create_info.pEnabledFeatures        = nullptr; /* chained */
             create_info.ppEnabledExtensionNames = (in_extensions.size() > 0) ? &in_extensions[0] : nullptr;
             create_info.ppEnabledLayerNames     = (in_layers.size    () > 0) ? &in_layers    [0] : nullptr;
             create_info.pQueueCreateInfos       = nullptr; /* chained later */
@@ -306,6 +306,8 @@ void Anvil::BaseDevice::create_device(const std::vector<const char*>& in_extensi
     /* Issue the request */
     {
         auto struct_chain_ptr = struct_chainer.create_chain();
+
+		struct_chain_ptr->get_root_struct()->pNext = m_create_info_ptr->pNext;
 
         result = Anvil::Vulkan::vkCreateDevice(physical_device_ptrs.at(0)->get_physical_device(),
                                                struct_chain_ptr->get_root_struct(),

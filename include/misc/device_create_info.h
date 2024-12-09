@@ -244,6 +244,8 @@ namespace Anvil
             return m_should_enable_shader_module_cache;
         }
 
+		const void *pNext = nullptr;
+
     private:
         /* Private type definitions */
         typedef struct QueueProperties
