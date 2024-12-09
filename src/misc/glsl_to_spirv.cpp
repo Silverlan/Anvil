@@ -258,7 +258,9 @@ Anvil::GLSLShaderToSPIRVGenerator::GLSLShaderToSPIRVGenerator(const Anvil::BaseD
      m_glsl_source_code_dirty(true),
      m_mode                  (in_mode),
      m_shader_stage          (in_shader_stage),
-     m_spirv_version         (in_spirv_version)
+     m_spirv_version         (in_spirv_version),
+     m_glsl_file_path{},
+     m_with_debug_info{false}
 {
     #ifdef ANVIL_LINK_WITH_GLSLANG
     {
@@ -612,7 +614,7 @@ bool Anvil::GLSLShaderToSPIRVGenerator::bake_spirv_blob() const
         if (m_spirv_blob.size() == 0)
         {
             /* Need to bake a brand new SPIR-V blob */
-            result = bake_spirv_blob_by_calling_glslang(m_glsl_source_code.c_str() );
+            result = bake_spirv_blob_by_calling_glslang(m_glsl_source_code.c_str(), m_glsl_file_path, m_with_debug_info );
         }
     }
 
@@ -639,7 +641,7 @@ end:
      *
      *  @return true if successful, false otherwise.
      **/
-    bool Anvil::GLSLShaderToSPIRVGenerator::bake_spirv_blob_by_calling_glslang(const char* in_body) const
+    bool Anvil::GLSLShaderToSPIRVGenerator::bake_spirv_blob_by_calling_glslang(const char* in_body, const std::optional<std::string> &glslFilePath, bool withDebugInfo) const
     {
         const EShLanguage         glslang_shader_stage = get_glslang_shader_stage();
         glslang::TIntermediate*   intermediate_ptr     = nullptr;
@@ -669,8 +671,14 @@ end:
             glslang::EShTargetLanguageVersion spirv_version;
 
             /* Try to compile the shader */
-            new_shader_ptr->setStrings(&in_body,
-                                       1);
+			const char *path = nullptr;
+		    int numNames = 0;
+		    if(glslFilePath) {
+			    path = glslFilePath->c_str();
+			    numNames = 1;
+		    }
+		    int length = strlen(in_body);
+		    new_shader_ptr->setStringsWithLengthsAndNames(&in_body, &length, &path, numNames);
 
             switch (m_spirv_version)
             {
@@ -723,7 +731,7 @@ end:
             result = new_shader_ptr->parse(m_limits_ptr->get_resource_ptr(),
                                            110,   /* defaultVersion    */
                                            false, /* forwardCompatible */
-                                           (EShMessages) (EShMsgDefault | EShMsgSpvRules | EShMsgVulkanRules) );
+                                           (EShMessages) (EShMsgDefault | EShMsgSpvRules | EShMsgVulkanRules | EShMsgDebugInfo) );
 
             m_debug_info_log  = new_shader_ptr->getInfoDebugLog();
             m_shader_info_log = new_shader_ptr->getInfoLog();
@@ -765,8 +773,13 @@ end:
                 goto end;
             }
 
+			glslang::SpvOptions options {};
+		    if(withDebugInfo) {
+			    options.generateDebugInfo = true;
+			    options.stripDebugInfo = false;
+		    }
             glslang::GlslangToSpv(*intermediate_ptr,
-                                  spirv_blob);
+                                  spirv_blob, &options);
 
             if (spirv_blob.size() == 0)
             {

@@ -32,6 +32,8 @@
 #include "misc/callbacks.h"
 #include "misc/debug.h"
 #include "misc/types.h"
+#include <string>
+#include <optional>
 #include <map>
 #include <memory>
 #include <sstream>
@@ -144,6 +146,9 @@ namespace Anvil
 
          /** Destructor. Releases all created Vulkan objects, as well as the SPIR-V blob data. */
          ~GLSLShaderToSPIRVGenerator();
+
+		 void set_glsl_file_path(const std::optional<std::string> &in_glsl_file_path) { m_glsl_file_path = in_glsl_file_path; }
+		 void set_with_debug_info(bool in_with_debug_info) { m_with_debug_info = in_with_debug_info; }
 
          /** Adds a "#define [definition_name] [value]" line after the first newline found in the
           *  source code.
@@ -366,7 +371,7 @@ namespace Anvil
         bool bake_glsl_source_code() const;
 
         #ifdef ANVIL_LINK_WITH_GLSLANG
-            bool        bake_spirv_blob_by_calling_glslang(const char* in_body) const;
+            bool        bake_spirv_blob_by_calling_glslang(const char* in_body, const std::optional<std::string> &glslFilePath = {}, bool withDebugInfo = false) const;
             EShLanguage get_glslang_shader_stage          () const;
         #else
             bool bake_spirv_blob_by_spawning_glslang_process(const std::string& in_glsl_filename_with_path,
@@ -383,6 +388,8 @@ namespace Anvil
         #endif
 
         std::string m_data;
+		std::optional<std::string> m_glsl_file_path;
+		bool m_with_debug_info;
         Mode        m_mode;
 
         mutable std::string m_glsl_source_code;
