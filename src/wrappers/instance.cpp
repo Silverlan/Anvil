@@ -683,7 +683,7 @@ bool Anvil::Instance::init()
         app_info.pNext              = nullptr;
         app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 
-		VkLayerSettingsCreateInfoEXT layer_settings_create_info {VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT, nullptr, layerSettings.size(), layerSettings.data()};
+		VkLayerSettingsCreateInfoEXT layer_settings_create_info {VK_STRUCTURE_TYPE_LAYER_SETTINGS_CREATE_INFO_EXT, nullptr, static_cast<uint32_t>(layerSettings.size()), layerSettings.data()};
 		layer_settings_create_info.pNext = m_create_info_ptr->pNext;
 
         create_info.enabledExtensionCount   = static_cast<uint32_t>(enabled_extensions_raw.size() );
