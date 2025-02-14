@@ -305,9 +305,7 @@ void Anvil::BaseDevice::create_device(const std::vector<const char*>& in_extensi
 
     /* Issue the request */
     {
-        auto struct_chain_ptr = struct_chainer.create_chain();
-
-		struct_chain_ptr->get_root_struct()->pNext = m_create_info_ptr->pNext;
+		auto struct_chain_ptr = struct_chainer.create_chain(m_create_info_ptr->pNext);
 
         result = Anvil::Vulkan::vkCreateDevice(physical_device_ptrs.at(0)->get_physical_device(),
                                                struct_chain_ptr->get_root_struct(),

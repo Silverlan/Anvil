@@ -218,7 +218,7 @@ namespace Anvil
                             true /* in_is_helper_struct */);
         }
 
-        std::unique_ptr<StructChain<StructType> > create_chain() const
+        std::unique_ptr<StructChain<StructType> > create_chain(const void *pNextLast = nullptr) const
         {
             size_t                                    helper_data_start_offset = 0;
             size_t                                    n_bytes_used             = 0;
@@ -260,12 +260,11 @@ namespace Anvil
                         current_struct_data_size);
 
                 /* Adjust pNext pointer to point at the next struct, if defined. */
+				VkStructHeader *header_ptr = reinterpret_cast<VkStructHeader *>(&result_ptr->raw_data.at(n_bytes_used));
                 if (n_struct != (n_structs - 1) )
-                {
-                    VkStructHeader* header_ptr = reinterpret_cast<VkStructHeader*>(&result_ptr->raw_data.at(n_bytes_used) );
-
                     header_ptr->next_ptr = &result_ptr->raw_data.at(0) + n_bytes_used + current_struct_data_size;
-                }
+				else
+					header_ptr->next_ptr = pNextLast;
 
                 n_bytes_used += current_struct_data_size;
             }
