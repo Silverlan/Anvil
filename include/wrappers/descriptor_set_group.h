@@ -133,6 +133,9 @@ namespace Anvil
          **/
         Anvil::DescriptorSet* get_descriptor_set(uint32_t in_n_set);
 
+		DescriptorPool *get_descriptor_pool() { return m_descriptor_pool_ptr.get(); }
+		const DescriptorPool *get_descriptor_pool() const { return m_descriptor_pool_ptr.get(); }
+
         const std::vector<const Anvil::DescriptorSetCreateInfo*>* get_descriptor_set_create_info() const;
         const Anvil::DescriptorSetCreateInfo*                     get_descriptor_set_create_info(uint32_t in_n_set) const;
 
