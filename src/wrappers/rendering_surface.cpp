@@ -24,6 +24,7 @@
 #include "misc/object_tracker.h"
 #include "misc/rendering_surface_create_info.h"
 #include "misc/window.h"
+#include "misc/window_generic.h"
 #include "wrappers/instance.h"
 #include "wrappers/physical_device.h"
 #include "wrappers/pipeline_layout.h"
@@ -388,38 +389,87 @@ bool Anvil::RenderingSurface::init()
     {
         auto window_ptr = m_create_info_ptr->get_window_ptr();
 
-        #if defined(ANVIL_INCLUDE_WIN3264_WINDOW_SYSTEM_SUPPORT) && defined(_WIN32)
-        {
-            VkWin32SurfaceCreateInfoKHR surface_create_info;
+		auto *generic_ptr = dynamic_cast<const Anvil::WindowGeneric *>(window_ptr);
+		if(generic_ptr != nullptr)
+		{
+			auto type = generic_ptr->get_type();
+#ifdef _WIN32
+			if(type != Anvil::WindowGeneric::Type::Win32)
+				result = VK_ERROR_INITIALIZATION_FAILED;
+			else {
+				VkWin32SurfaceCreateInfoKHR surface_create_info;
 
-            surface_create_info.flags     = 0;
-            surface_create_info.hinstance = GetModuleHandle(nullptr);
-            surface_create_info.hwnd      = window_ptr->get_handle();
-            surface_create_info.pNext     = nullptr;
-            surface_create_info.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+				surface_create_info.flags = 0;
+				surface_create_info.hinstance = GetModuleHandle(nullptr);
+				surface_create_info.hwnd = window_ptr->get_handle();
+				surface_create_info.pNext = nullptr;
+				surface_create_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 
-            result = instance_ptr->get_extension_khr_win32_surface_entrypoints().vkCreateWin32SurfaceKHR(instance_ptr->get_instance_vk(),
-                                                                                                        &surface_create_info,
-                                                                                                         nullptr, /* pAllocator */
-                                                                                                        &m_surface);
-        }
-        #endif
-        #if defined(ANVIL_INCLUDE_XCB_WINDOW_SYSTEM_SUPPORT) && !defined(_WIN32)
-        {
-            VkXcbSurfaceCreateInfoKHR surface_create_info;
+				result = instance_ptr->get_extension_khr_win32_surface_entrypoints().vkCreateWin32SurfaceKHR(instance_ptr->get_instance_vk(), &surface_create_info, nullptr, /* pAllocator */
+				  &m_surface);
+			}
+#else
+			if(type == Anvil::WindowGeneric::Type::Xcb) {
+				VkXcbSurfaceCreateInfoKHR surface_create_info;
 
-            surface_create_info.flags       = 0;
-            surface_create_info.window      = window_ptr->get_handle();
-            surface_create_info.connection  = static_cast<xcb_connection_t*>(window_ptr->get_connection());
-            surface_create_info.pNext       = nullptr;
-            surface_create_info.sType       = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+				surface_create_info.flags = 0;
+				surface_create_info.window = window_ptr->get_handle();
+				surface_create_info.connection = static_cast<xcb_connection_t *>(window_ptr->get_connection());
+				surface_create_info.pNext = nullptr;
+				surface_create_info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
 
-            result = instance_ptr->get_extension_khr_xcb_surface_entrypoints().vkCreateXcbSurfaceKHR(instance_ptr->get_instance_vk(),
-                                                                                                    &surface_create_info,
-                                                                                                     nullptr, /* pAllocator */
-                                                                                                    &m_surface);
-            }
-        #endif
+				result = instance_ptr->get_extension_khr_xcb_surface_entrypoints().vkCreateXcbSurfaceKHR(instance_ptr->get_instance_vk(), &surface_create_info, nullptr, /* pAllocator */
+				  &m_surface);
+			}
+			else if(type == Anvil::WindowGeneric::Type::Wayland) {
+				VkWaylandSurfaceCreateInfoKHR surface_create_info;
+				surface_create_info.flags = 0;
+				surface_create_info.display = static_cast<wl_display *>(window_ptr->get_connection());
+				surface_create_info.surface = window_ptr->get_handle();
+				surface_create_info.pNext = nullptr;
+				surface_create_info.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+				result = instance_ptr->get_extension_khr_wayland_surface_entrypoints().vkCreateWaylandSurfaceKHR(instance_ptr->get_instance_vk(), &surface_create_info, nullptr, /* pAllocator */
+				  &m_surface);
+			}
+			else
+				result = VK_ERROR_INITIALIZATION_FAILED;
+#endif
+		}
+		else
+		{
+			#if defined(ANVIL_INCLUDE_WIN3264_WINDOW_SYSTEM_SUPPORT) && defined(_WIN32)
+			{
+				VkWin32SurfaceCreateInfoKHR surface_create_info;
+
+				surface_create_info.flags     = 0;
+				surface_create_info.hinstance = GetModuleHandle(nullptr);
+				surface_create_info.hwnd      = window_ptr->get_handle();
+				surface_create_info.pNext     = nullptr;
+				surface_create_info.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+
+				result = instance_ptr->get_extension_khr_win32_surface_entrypoints().vkCreateWin32SurfaceKHR(instance_ptr->get_instance_vk(),
+																											&surface_create_info,
+																											 nullptr, /* pAllocator */
+																											&m_surface);
+			}
+			#endif
+			#if defined(ANVIL_INCLUDE_XCB_WINDOW_SYSTEM_SUPPORT) && !defined(_WIN32)
+			{
+				VkXcbSurfaceCreateInfoKHR surface_create_info;
+
+				surface_create_info.flags       = 0;
+				surface_create_info.window      = window_ptr->get_handle();
+				surface_create_info.connection  = static_cast<xcb_connection_t*>(window_ptr->get_connection());
+				surface_create_info.pNext       = nullptr;
+				surface_create_info.sType       = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+
+				result = instance_ptr->get_extension_khr_xcb_surface_entrypoints().vkCreateXcbSurfaceKHR(instance_ptr->get_instance_vk(),
+																										&surface_create_info,
+																										 nullptr, /* pAllocator */
+																										&m_surface);
+				}
+			#endif
+		}
 
         anvil_assert_vk_call_succeeded(result);
         if (is_vk_call_successful(result) )

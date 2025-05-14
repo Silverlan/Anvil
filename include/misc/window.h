@@ -90,6 +90,8 @@ namespace Anvil
         WINDOW_PLATFORM_WAYLAND,
     #endif
 
+		WINDOW_PLATFORM_GENERIC,
+
         /* Always last */
         WINDOW_PLATFORM_COUNT,
         WINDOW_PLATFORM_UNKNOWN = WINDOW_PLATFORM_COUNT
