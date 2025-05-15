@@ -1181,6 +1181,14 @@ namespace Anvil
                 ExtensionKHRXcbSurfaceEntrypoints();
             } ExtensionKHRXcbSurfaceEntrypoints;
         #endif
+        #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+            typedef struct ExtensionKHRWaylandSurfaceEntrypoints
+            {
+                PFN_vkCreateWaylandSurfaceKHR vkCreateWaylandSurfaceKHR;
+
+                ExtensionKHRWaylandSurfaceEntrypoints();
+            } ExtensionKHRWaylandSurfaceEntrypoints;
+        #endif
     #endif
 
     typedef struct ExtensionKHRDeviceGroupCreationEntrypoints

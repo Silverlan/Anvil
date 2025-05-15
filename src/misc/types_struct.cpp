@@ -546,6 +546,12 @@ Anvil::ExtensionKHRSwapchainEntrypoints::ExtensionKHRSwapchainEntrypoints()
             vkCreateXcbSurfaceKHR = nullptr;
         }
     #endif
+    #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+        Anvil::ExtensionKHRWaylandSurfaceEntrypoints::ExtensionKHRWaylandSurfaceEntrypoints()
+        {
+            vkCreateWaylandSurfaceKHR = nullptr;
+        }
+    #endif
 #endif
 
 Anvil::ExtensionKHRGetMemoryRequirements2Entrypoints::ExtensionKHRGetMemoryRequirements2Entrypoints()

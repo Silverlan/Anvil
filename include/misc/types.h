@@ -56,6 +56,9 @@
     #if defined(ANVIL_INCLUDE_XCB_WINDOW_SYSTEM_SUPPORT)
         #define VK_USE_PLATFORM_XCB_KHR
     #endif
+    #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+        #define VK_USE_PLATFORM_WAYLAND_KHR
+    #endif
 #endif
 
 #ifdef _WIN32

@@ -398,6 +398,15 @@ const Anvil::ExtensionKHRSurfaceEntrypoints& Anvil::Instance::get_extension_khr_
             return m_khr_xcb_surface_entrypoints;
         }
     #endif
+    #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+        /** Please see header for specification */
+        const Anvil::ExtensionKHRWaylandSurfaceEntrypoints& Anvil::Instance::get_extension_khr_wayland_surface_entrypoints() const
+        {
+            anvil_assert(m_enabled_extensions_info_ptr->get_instance_extension_info()->khr_wayland_surface() );
+
+            return m_khr_wayland_surface_entrypoints;
+        }
+    #endif
 #endif
 
 /** Please see header for specification */
@@ -461,6 +470,9 @@ bool Anvil::Instance::init()
             #if defined(ANVIL_INCLUDE_XCB_WINDOW_SYSTEM_SUPPORT)
                 VK_KHR_XCB_SURFACE_EXTENSION_NAME,
             #endif
+            #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+                VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME,
+            #endif
         #endif
 
         VK_EXT_DEBUG_REPORT_EXTENSION_NAME
@@ -476,6 +488,9 @@ bool Anvil::Instance::init()
         #else
             #if defined(ANVIL_INCLUDE_XCB_WINDOW_SYSTEM_SUPPORT)
                 VK_KHR_XCB_SURFACE_EXTENSION_NAME,
+            #endif
+            #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+                VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME,
             #endif
         #endif
     };
@@ -798,6 +813,17 @@ void Anvil::Instance::init_func_pointers()
                                                                                                                                                        "vkCreateXcbSurfaceKHR") );
 
                 anvil_assert(m_khr_xcb_surface_entrypoints.vkCreateXcbSurfaceKHR != nullptr);
+            }
+        }
+        #endif
+        #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+        {
+            if (m_enabled_extensions_info_ptr->get_instance_extension_info()->khr_wayland_surface() )
+            {
+                m_khr_wayland_surface_entrypoints.vkCreateWaylandSurfaceKHR = reinterpret_cast<PFN_vkCreateWaylandSurfaceKHR>(Anvil::Vulkan::vkGetInstanceProcAddr(m_instance,
+                                                                                                                                                       "vkCreateWaylandSurfaceKHR") );
+
+                anvil_assert(m_khr_wayland_surface_entrypoints.vkCreateWaylandSurfaceKHR != nullptr);
             }
         }
         #endif

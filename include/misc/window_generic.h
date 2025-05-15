@@ -41,7 +41,14 @@ namespace Anvil
 
 			Count,
 		};
-        static Anvil::WindowUniquePtr create(Type type, void *windowHandle, uint32_t width, uint32_t height, bool visible);
+		union Handle {
+			void *win32Window;
+			void *waylandWindow;
+			uint32_t xcbWindow;
+		};
+		using Connection = void*;
+		using Display = void*;
+        static Anvil::WindowUniquePtr create(Type type, Handle handle, Display display, Connection connection, uint32_t width, uint32_t height, bool visible);
 
         virtual ~WindowGeneric() { /* Stub */ }
 
@@ -54,14 +61,15 @@ namespace Anvil
             return WINDOW_PLATFORM_GENERIC;
         }
 
-        /* This function should never be called under Windows */
-        virtual void* get_connection() const
+        virtual bool is_dummy()
         {
-            anvil_assert_fail();
-
-            return nullptr;
+            return false;
         }
+
+        /* This function should never be called under Windows */
+        virtual void* get_connection() const { return m_connection; }
 		Type get_type() const { return m_type; }
+		Display get_display() const { return m_display; }
 
         /** Changes the window title.
          *
@@ -73,8 +81,10 @@ namespace Anvil
         /* Private functions */
 
         WindowGeneric(Type type,
-			          void *windowHandle,
+			          Handle handle,
 			          const std::string             &in_title,
+                      Display                       display,
+		              Connection                    connection,
                       unsigned int                   in_width,
                       unsigned int                   in_height,
                       PresentCallbackFunction        in_present_callback_func);
@@ -84,6 +94,8 @@ namespace Anvil
 
         /* Private variables */
 		Type m_type;
+		Display m_display;
+		Connection m_connection;
     };
 }; /* namespace Anvil */
 

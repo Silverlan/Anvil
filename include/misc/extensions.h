@@ -280,6 +280,9 @@ namespace Anvil
                 #if defined(ANVIL_INCLUDE_XCB_WINDOW_SYSTEM_SUPPORT)
                     ValueType khr_xcb_surface;
                 #endif
+                #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+                    ValueType khr_wayland_surface;
+                #endif
             #endif
 
             std::map<std::string, ValueType> values_by_extension_names;
@@ -320,6 +323,9 @@ namespace Anvil
                     #else
                         #if defined(ANVIL_INCLUDE_XCB_WINDOW_SYSTEM_SUPPORT)
                             {ExtensionData(VK_KHR_XCB_SURFACE_EXTENSION_NAME, &khr_xcb_surface)},
+                        #endif
+                        #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+                            {ExtensionData(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME, &khr_wayland_surface)},
                         #endif
                     #endif
                 };
@@ -472,6 +478,9 @@ namespace Anvil
         #else
             #if defined(ANVIL_INCLUDE_XCB_WINDOW_SYSTEM_SUPPORT)
                 virtual bool khr_xcb_surface() const = 0;
+            #endif
+            #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+                virtual bool khr_wayland_surface() const = 0;
             #endif
         #endif
 
@@ -1228,6 +1237,14 @@ namespace Anvil
                     anvil_assert(!m_expose_device_extensions);
 
                     return m_instance_extensions_ptr->khr_xcb_surface;
+                }
+            #endif
+            #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+                ValueType khr_wayland_surface() const final
+                {
+                    anvil_assert(!m_expose_device_extensions);
+
+                    return m_instance_extensions_ptr->khr_wayland_surface;
                 }
             #endif
         #endif

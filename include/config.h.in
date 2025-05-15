@@ -18,3 +18,6 @@
 
 /* Defined if XCB window system support is to be included in Anvil */
 #cmakedefine ANVIL_INCLUDE_XCB_WINDOW_SYSTEM_SUPPORT
+
+/* Defined if Wayland window system support is to be included in Anvil */
+#cmakedefine ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT

@@ -96,6 +96,13 @@ namespace Anvil
          **/
         const ExtensionKHRXcbSurfaceEntrypoints& get_extension_khr_xcb_surface_entrypoints() const;
     #endif
+    #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+        /** Returns a container with entry-points to functions introduced by VK_KHR_wayland_surface.
+         *
+         *  Will fire an assertion failure if the extension is not supported.
+         **/
+        const ExtensionKHRWaylandSurfaceEntrypoints& get_extension_khr_wayland_surface_entrypoints() const;
+    #endif
 #endif
 
         /** Returns a container with entry-points to functions introduced by VK_KHR_device_group_creation extension.
@@ -228,6 +235,9 @@ namespace Anvil
         #else
             #if defined(ANVIL_INCLUDE_XCB_WINDOW_SYSTEM_SUPPORT)
                 ExtensionKHRXcbSurfaceEntrypoints m_khr_xcb_surface_entrypoints;
+            #endif
+            #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+                ExtensionKHRWaylandSurfaceEntrypoints m_khr_wayland_surface_entrypoints;
             #endif
         #endif
 

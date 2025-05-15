@@ -399,6 +399,9 @@ bool Anvil::Swapchain::init()
                 #if defined(ANVIL_INCLUDE_XCB_WINDOW_SYSTEM_SUPPORT)
                     required_surface_extension_name = VK_KHR_XCB_SURFACE_EXTENSION_NAME;
                 #endif
+                #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
+                    required_surface_extension_name = VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME;
+                #endif
             #endif
 
             anvil_assert(required_surface_extension_name == nullptr                                                            ||

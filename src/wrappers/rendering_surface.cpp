@@ -424,8 +424,8 @@ bool Anvil::RenderingSurface::init()
 			else if(type == Anvil::WindowGeneric::Type::Wayland) {
 				VkWaylandSurfaceCreateInfoKHR surface_create_info;
 				surface_create_info.flags = 0;
-				surface_create_info.display = static_cast<wl_display *>(window_ptr->get_connection());
-				surface_create_info.surface = window_ptr->get_handle();
+				surface_create_info.display = reinterpret_cast<wl_display *>(window_ptr->get_connection());
+				surface_create_info.surface = reinterpret_cast<wl_surface *>(window_ptr->get_handle());
 				surface_create_info.pNext = nullptr;
 				surface_create_info.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
 				result = instance_ptr->get_extension_khr_wayland_surface_entrypoints().vkCreateWaylandSurfaceKHR(instance_ptr->get_instance_vk(), &surface_create_info, nullptr, /* pAllocator */
