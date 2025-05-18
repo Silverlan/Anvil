@@ -413,7 +413,7 @@ bool Anvil::RenderingSurface::init()
 				VkXcbSurfaceCreateInfoKHR surface_create_info;
 
 				surface_create_info.flags = 0;
-				surface_create_info.window = window_ptr->get_handle();
+				surface_create_info.window = generic_ptr->get_generic_handle().xcbWindow;
 				surface_create_info.connection = static_cast<xcb_connection_t *>(window_ptr->get_connection());
 				surface_create_info.pNext = nullptr;
 				surface_create_info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
@@ -422,13 +422,15 @@ bool Anvil::RenderingSurface::init()
 				  &m_surface);
 			}
 			else if(type == Anvil::WindowGeneric::Type::Wayland) {
+                auto vkInstance = instance_ptr->get_instance_vk();
+                auto &entrypoints = instance_ptr->get_extension_khr_wayland_surface_entrypoints();
 				VkWaylandSurfaceCreateInfoKHR surface_create_info;
 				surface_create_info.flags = 0;
 				surface_create_info.display = reinterpret_cast<wl_display *>(window_ptr->get_connection());
-				surface_create_info.surface = reinterpret_cast<wl_surface *>(window_ptr->get_handle());
+				surface_create_info.surface = reinterpret_cast<wl_surface *>(generic_ptr->get_generic_handle().waylandWindow);
 				surface_create_info.pNext = nullptr;
 				surface_create_info.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
-				result = instance_ptr->get_extension_khr_wayland_surface_entrypoints().vkCreateWaylandSurfaceKHR(instance_ptr->get_instance_vk(), &surface_create_info, nullptr, /* pAllocator */
+				result = entrypoints.vkCreateWaylandSurfaceKHR(vkInstance, &surface_create_info, nullptr, /* pAllocator */
 				  &m_surface);
 			}
 			else
@@ -736,6 +738,28 @@ void Anvil::RenderingSurface::update_surface_extents() const
         {
             m_height = surface_caps.current_extent.height;
             m_width  = surface_caps.current_extent.width;
+
+            if(m_width == m_height && m_width == std::numeric_limits<uint32_t>::max())
+            {
+                // The surface is not limited to a specific size, so we'll just use the window framebuffer size
+                auto *generic_ptr = dynamic_cast<const Anvil::WindowGeneric *>(window_ptr);
+                if(generic_ptr != nullptr)
+                {
+                    m_height = generic_ptr->get_framebuffer_height();
+                    m_width  = generic_ptr->get_framebuffer_width();
+                    
+                    // Clamp to max extents
+                    if(m_height > surface_caps.max_image_extent.height)
+                        m_height = surface_caps.max_image_extent.height;
+                    if(m_width > surface_caps.max_image_extent.width)
+                        m_width = surface_caps.max_image_extent.width;
+                }
+                else
+                {
+                    m_height = surface_caps.min_image_extent.height;
+                    m_width  = surface_caps.min_image_extent.width;
+                }
+            }
         }
         else
         {

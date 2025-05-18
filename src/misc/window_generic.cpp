@@ -31,6 +31,8 @@ Anvil::WindowGeneric::WindowGeneric(Type type,
 	                                Connection connection,
                                     unsigned int                   in_width,
                                     unsigned int                   in_height,
+                                    uint32_t                   fbWidth,
+                                    uint32_t                   fbHeight,
                                     Anvil::PresentCallbackFunction in_present_callback_func)
     :Window(in_title,
             in_width,
@@ -38,15 +40,17 @@ Anvil::WindowGeneric::WindowGeneric(Type type,
             true, /* in_closable */
             in_present_callback_func)
 {
-	m_window = *reinterpret_cast<WindowHandle*>(&handle);
     m_window_owned = false;
 	m_type = type;
     m_display = display;
 	m_connection = connection;
+    m_handle = handle;
+    m_fbWidth = fbWidth;
+    m_fbHeight = fbHeight;
 }
 
 /** Please see header for specification */
-Anvil::WindowUniquePtr Anvil::WindowGeneric::create(Type type, Handle handle, Display display, Connection connection, uint32_t width, uint32_t height, bool visible)
+Anvil::WindowUniquePtr Anvil::WindowGeneric::create(Type type, Handle handle, Display display, Connection connection, uint32_t width, uint32_t height, bool visible, uint32_t fbWidth, uint32_t fbHeight)
 {
     WindowUniquePtr result_ptr (nullptr,
                                 std::default_delete<Window>() );
@@ -64,6 +68,8 @@ Anvil::WindowUniquePtr Anvil::WindowGeneric::create(Type type, Handle handle, Di
                                  connection,
                                  window_size[0],
                                  window_size[1],
+                                 fbWidth,
+                                 fbHeight,
                                  nullptr) /* present_callback_func_ptr */
     );
 

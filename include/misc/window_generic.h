@@ -48,7 +48,7 @@ namespace Anvil
 		};
 		using Connection = void*;
 		using Display = void*;
-        static Anvil::WindowUniquePtr create(Type type, Handle handle, Display display, Connection connection, uint32_t width, uint32_t height, bool visible);
+        static Anvil::WindowUniquePtr create(Type type, Handle handle, Display display, Connection connection, uint32_t width, uint32_t height, bool visible, uint32_t fbWidth, uint32_t fbHeight);
 
         virtual ~WindowGeneric() { /* Stub */ }
 
@@ -70,6 +70,9 @@ namespace Anvil
         virtual void* get_connection() const { return m_connection; }
 		Type get_type() const { return m_type; }
 		Display get_display() const { return m_display; }
+        Handle get_generic_handle() const { return m_handle; }
+        uint32_t get_framebuffer_width() const { return m_fbWidth; }
+        uint32_t get_framebuffer_height() const { return m_fbHeight; }
 
         /** Changes the window title.
          *
@@ -87,6 +90,8 @@ namespace Anvil
 		              Connection                    connection,
                       unsigned int                   in_width,
                       unsigned int                   in_height,
+                      uint32_t                      fbWidth,
+                      uint32_t                      fbHeight,
                       PresentCallbackFunction        in_present_callback_func);
 
         /** Creates a new system window and prepares it for usage. */
@@ -96,6 +101,9 @@ namespace Anvil
 		Type m_type;
 		Display m_display;
 		Connection m_connection;
+        Handle m_handle;
+        uint32_t m_fbWidth;
+        uint32_t m_fbHeight;
     };
 }; /* namespace Anvil */
 
