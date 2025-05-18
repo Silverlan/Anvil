@@ -32,6 +32,8 @@
 #include "wrappers/queue.h"
 #include "config.h"
 
+#undef max
+
 /* Please see header for specification */
 Anvil::RenderingSurface::RenderingSurface(Anvil::RenderingSurfaceCreateInfoUniquePtr in_create_info_ptr)
     :DebugMarkerSupportProvider(in_create_info_ptr->get_device_ptr(),
