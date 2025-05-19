@@ -52,8 +52,8 @@ namespace Anvil
 
         virtual ~WindowGeneric() { /* Stub */ }
 
-        virtual void close();
-        virtual void run();
+        virtual void close() override;
+        virtual void run() override;
 
         /* Returns window's platform */
         WindowPlatform get_platform() const
@@ -61,13 +61,13 @@ namespace Anvil
             return WINDOW_PLATFORM_GENERIC;
         }
 
-        virtual bool is_dummy()
+        bool is_dummy()
         {
             return false;
         }
 
         /* This function should never be called under Windows */
-        virtual void* get_connection() const { return m_connection; }
+        virtual void* get_connection() const override { return m_connection; }
 		Type get_type() const { return m_type; }
 		Display get_display() const { return m_display; }
         Handle get_generic_handle() const { return m_handle; }
