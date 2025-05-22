@@ -403,7 +403,7 @@ bool Anvil::RenderingSurface::init()
 
 				surface_create_info.flags = 0;
 				surface_create_info.hinstance = GetModuleHandle(nullptr);
-				surface_create_info.hwnd = window_ptr->get_handle();
+				surface_create_info.hwnd = static_cast<HWND>(generic_ptr->get_generic_handle().win32Window);
 				surface_create_info.pNext = nullptr;
 				surface_create_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 
