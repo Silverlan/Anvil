@@ -73,6 +73,11 @@ namespace Anvil
         Handle get_generic_handle() const { return m_handle; }
         uint32_t get_framebuffer_width() const { return m_fbWidth; }
         uint32_t get_framebuffer_height() const { return m_fbHeight; }
+        void set_framebuffer_size(uint32_t in_width, uint32_t in_height)
+        {
+            m_fbWidth = in_width;
+            m_fbHeight = in_height;
+        }
 
         /** Changes the window title.
          *
