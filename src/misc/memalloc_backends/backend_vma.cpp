@@ -256,7 +256,6 @@ bool Anvil::MemoryAllocatorBackends::VMA::bake(Anvil::MemoryAllocator::Items& in
                                      &allocation_create_info,
                                      &allocation,
                                      &allocation_info);
-                                     anvil_assert(current_item_ptr->buffer_ptr != nullptr);
         if (!is_vk_call_successful(result_vk) )
         {
             anvil_assert_with_msg(is_vk_call_successful(result_vk), (std::string {"vmaAllocateMemory failed: "} +std::to_string(result_vk)).c_str());
