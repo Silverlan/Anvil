@@ -38,6 +38,7 @@ namespace Anvil
 			Win32 = 0,
 			Xcb,
 			Wayland,
+			Windowless,
 
 			Count,
 		};

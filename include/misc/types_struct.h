@@ -1190,6 +1190,14 @@ namespace Anvil
             } ExtensionKHRWaylandSurfaceEntrypoints;
         #endif
     #endif
+    #if defined(ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT)
+        typedef struct ExtensionEXTHeadlessSurfaceEntrypoints
+        {
+            PFN_vkCreateHeadlessSurfaceEXT vkCreateHeadlessSurfaceEXT;
+
+            ExtensionEXTHeadlessSurfaceEntrypoints();
+        } ExtensionEXTHeadlessSurfaceEntrypoints;
+    #endif
 
     typedef struct ExtensionKHRDeviceGroupCreationEntrypoints
     {

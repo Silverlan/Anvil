@@ -354,7 +354,10 @@ bool Anvil::RenderingSurface::init()
     auto                     instance_ptr      (m_create_info_ptr->get_instance_ptr() );
     uint32_t                 n_physical_devices(0);
     VkResult                 result            (VK_SUCCESS);
-    const WindowPlatform     window_platform   (m_create_info_ptr->get_window_ptr()->get_platform());
+    WindowPlatform     window_platform = WindowPlatform::WINDOW_PLATFORM_DUMMY;
+    auto *windowPtr = m_create_info_ptr->get_window_ptr();
+    if (windowPtr)
+        window_platform  = (windowPtr->get_platform());
 
     const bool               is_dummy_window_platform(window_platform == WINDOW_PLATFORM_DUMMY                     ||
                                                       window_platform == WINDOW_PLATFORM_DUMMY_WITH_PNG_SNAPSHOTS);
@@ -435,6 +438,15 @@ bool Anvil::RenderingSurface::init()
 				result = entrypoints.vkCreateWaylandSurfaceKHR(vkInstance, &surface_create_info, nullptr, /* pAllocator */
 				  &m_surface);
 			}
+		    else if (type == Anvil::WindowGeneric::Type::Windowless) {
+		        auto vkInstance = instance_ptr->get_instance_vk();
+		        auto &entrypoints = instance_ptr->get_extension_ext_headless_surface_entrypoints();
+		        VkHeadlessSurfaceCreateInfoEXT surface_create_info;
+		        surface_create_info.flags = 0;
+		        surface_create_info.pNext = nullptr;
+		        surface_create_info.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+		        result = entrypoints.vkCreateHeadlessSurfaceEXT(vkInstance, &surface_create_info, nullptr, &m_surface);
+		    }
 			else
 				result = VK_ERROR_INITIALIZATION_FAILED;
 #endif

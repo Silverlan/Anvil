@@ -104,6 +104,13 @@ namespace Anvil
         const ExtensionKHRWaylandSurfaceEntrypoints& get_extension_khr_wayland_surface_entrypoints() const;
     #endif
 #endif
+#if defined(ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT)
+    /** Returns a container with entry-points to functions introduced by VK_EXT_headless_surface.
+     *
+     *  Will fire an assertion failure if the extension is not supported.
+     **/
+    const ExtensionEXTHeadlessSurfaceEntrypoints& get_extension_ext_headless_surface_entrypoints() const;
+#endif
 
         /** Returns a container with entry-points to functions introduced by VK_KHR_device_group_creation extension.
          *
@@ -239,6 +246,9 @@ namespace Anvil
             #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
                 ExtensionKHRWaylandSurfaceEntrypoints m_khr_wayland_surface_entrypoints;
             #endif
+        #endif
+        #if defined(ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT)
+            ExtensionEXTHeadlessSurfaceEntrypoints m_ext_headless_surface_entrypoints;
         #endif
 
         Anvil::APIVersion                  m_api_version;

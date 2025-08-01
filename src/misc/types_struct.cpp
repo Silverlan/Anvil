@@ -553,6 +553,12 @@ Anvil::ExtensionKHRSwapchainEntrypoints::ExtensionKHRSwapchainEntrypoints()
         }
     #endif
 #endif
+#if defined(ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT)
+    Anvil::ExtensionEXTHeadlessSurfaceEntrypoints::ExtensionEXTHeadlessSurfaceEntrypoints()
+    {
+        vkCreateHeadlessSurfaceEXT = nullptr;
+    }
+#endif
 
 Anvil::ExtensionKHRGetMemoryRequirements2Entrypoints::ExtensionKHRGetMemoryRequirements2Entrypoints()
 {

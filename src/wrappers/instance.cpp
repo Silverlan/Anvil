@@ -408,6 +408,15 @@ const Anvil::ExtensionKHRSurfaceEntrypoints& Anvil::Instance::get_extension_khr_
         }
     #endif
 #endif
+    #if defined(ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT)
+    /** Please see header for specification */
+    const Anvil::ExtensionEXTHeadlessSurfaceEntrypoints& Anvil::Instance::get_extension_ext_headless_surface_entrypoints() const
+    {
+        anvil_assert(m_enabled_extensions_info_ptr->get_instance_extension_info()->ext_headless_surface() );
+
+        return m_ext_headless_surface_entrypoints;
+    }
+    #endif
 
 /** Please see header for specification */
 const Anvil::ExtensionKHRDeviceGroupCreationEntrypoints& Anvil::Instance::get_extension_khr_device_group_creation_entrypoints() const
@@ -474,6 +483,9 @@ bool Anvil::Instance::init()
                 VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME,
             #endif
         #endif
+        #if defined(ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT)
+            VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME,
+        #endif
 
         VK_EXT_DEBUG_REPORT_EXTENSION_NAME
     };
@@ -492,6 +504,9 @@ bool Anvil::Instance::init()
             #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
                 VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME,
             #endif
+        #endif
+        #if defined(ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT)
+            VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME,
         #endif
     };
 
@@ -827,6 +842,17 @@ void Anvil::Instance::init_func_pointers()
             }
         }
         #endif
+    }
+    #endif
+    #if defined(ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT)
+    {
+        if (m_enabled_extensions_info_ptr->get_instance_extension_info()->ext_headless_surface() )
+        {
+            m_ext_headless_surface_entrypoints.vkCreateHeadlessSurfaceEXT = reinterpret_cast<PFN_vkCreateHeadlessSurfaceEXT>(Anvil::Vulkan::vkGetInstanceProcAddr(m_instance,
+                                                                                                                                                   "vkCreateHeadlessSurfaceEXT") );
+
+            anvil_assert(m_ext_headless_surface_entrypoints.vkCreateHeadlessSurfaceEXT != nullptr);
+        }
     }
     #endif
 

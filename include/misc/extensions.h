@@ -284,6 +284,9 @@ namespace Anvil
                     ValueType khr_wayland_surface;
                 #endif
             #endif
+            #if defined(ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT)
+                ValueType ext_headless_surface;
+            #endif
 
             std::map<std::string, ValueType> values_by_extension_names;
 
@@ -327,6 +330,9 @@ namespace Anvil
                         #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
                             {ExtensionData(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME, &khr_wayland_surface)},
                         #endif
+                    #endif
+                    #if defined(ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT)
+                        {ExtensionData(VK_EXT_HEADLESS_SURFACE_EXTENSION_NAME, &ext_headless_surface)},
                     #endif
                 };
 
@@ -482,6 +488,9 @@ namespace Anvil
             #if defined(ANVIL_INCLUDE_WAYLAND_WINDOW_SYSTEM_SUPPORT)
                 virtual bool khr_wayland_surface() const = 0;
             #endif
+        #endif
+        #if defined(ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT)
+            virtual bool ext_headless_surface() const = 0;
         #endif
 
         virtual bool by_name(const std::string& in_name) const = 0;
@@ -1247,6 +1256,14 @@ namespace Anvil
                     return m_instance_extensions_ptr->khr_wayland_surface;
                 }
             #endif
+        #endif
+        #if defined(ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT)
+            ValueType ext_headless_surface() const final
+            {
+                anvil_assert(!m_expose_device_extensions);
+
+                return m_instance_extensions_ptr->ext_headless_surface;
+            }
         #endif
 
         /* Private variables */
