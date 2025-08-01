@@ -398,48 +398,9 @@ bool Anvil::RenderingSurface::init()
 		if(generic_ptr != nullptr)
 		{
 			auto type = generic_ptr->get_type();
-#ifdef _WIN32
-			if(type != Anvil::WindowGeneric::Type::Win32)
-				result = VK_ERROR_INITIALIZATION_FAILED;
-			else {
-				VkWin32SurfaceCreateInfoKHR surface_create_info;
-
-				surface_create_info.flags = 0;
-				surface_create_info.hinstance = GetModuleHandle(nullptr);
-				surface_create_info.hwnd = static_cast<HWND>(generic_ptr->get_generic_handle().win32Window);
-				surface_create_info.pNext = nullptr;
-				surface_create_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-
-				result = instance_ptr->get_extension_khr_win32_surface_entrypoints().vkCreateWin32SurfaceKHR(instance_ptr->get_instance_vk(), &surface_create_info, nullptr, /* pAllocator */
-				  &m_surface);
-			}
-#else
-			if(type == Anvil::WindowGeneric::Type::Xcb) {
-				VkXcbSurfaceCreateInfoKHR surface_create_info;
-
-				surface_create_info.flags = 0;
-				surface_create_info.window = generic_ptr->get_generic_handle().xcbWindow;
-				surface_create_info.connection = static_cast<xcb_connection_t *>(window_ptr->get_connection());
-				surface_create_info.pNext = nullptr;
-				surface_create_info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
-
-				result = instance_ptr->get_extension_khr_xcb_surface_entrypoints().vkCreateXcbSurfaceKHR(instance_ptr->get_instance_vk(), &surface_create_info, nullptr, /* pAllocator */
-				  &m_surface);
-			}
-			else if(type == Anvil::WindowGeneric::Type::Wayland) {
-                auto vkInstance = instance_ptr->get_instance_vk();
-                auto &entrypoints = instance_ptr->get_extension_khr_wayland_surface_entrypoints();
-				VkWaylandSurfaceCreateInfoKHR surface_create_info;
-				surface_create_info.flags = 0;
-				surface_create_info.display = reinterpret_cast<wl_display *>(window_ptr->get_connection());
-				surface_create_info.surface = reinterpret_cast<wl_surface *>(generic_ptr->get_generic_handle().waylandWindow);
-				surface_create_info.pNext = nullptr;
-				surface_create_info.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
-				result = entrypoints.vkCreateWaylandSurfaceKHR(vkInstance, &surface_create_info, nullptr, /* pAllocator */
-				  &m_surface);
-			}
+		    auto handled = false;
 #ifdef ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT
-		    else if (type == Anvil::WindowGeneric::Type::Windowless) {
+		    if (type == Anvil::WindowGeneric::Type::Windowless) {
 		        auto vkInstance = instance_ptr->get_instance_vk();
 		        auto &entrypoints = instance_ptr->get_extension_ext_headless_surface_entrypoints();
 		        VkHeadlessSurfaceCreateInfoEXT surface_create_info;
@@ -447,10 +408,55 @@ bool Anvil::RenderingSurface::init()
 		        surface_create_info.pNext = nullptr;
 		        surface_create_info.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
 		        result = entrypoints.vkCreateHeadlessSurfaceEXT(vkInstance, &surface_create_info, nullptr, &m_surface);
+		        handled = true;
 		    }
 #endif
-			else
-				result = VK_ERROR_INITIALIZATION_FAILED;
+#ifdef _WIN32
+		    if (!handled) {
+		        if(type != Anvil::WindowGeneric::Type::Win32)
+		            result = VK_ERROR_INITIALIZATION_FAILED;
+		        else {
+		            VkWin32SurfaceCreateInfoKHR surface_create_info;
+
+		            surface_create_info.flags = 0;
+		            surface_create_info.hinstance = GetModuleHandle(nullptr);
+		            surface_create_info.hwnd = static_cast<HWND>(generic_ptr->get_generic_handle().win32Window);
+		            surface_create_info.pNext = nullptr;
+		            surface_create_info.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+
+		            result = instance_ptr->get_extension_khr_win32_surface_entrypoints().vkCreateWin32SurfaceKHR(instance_ptr->get_instance_vk(), &surface_create_info, nullptr, /* pAllocator */
+                      &m_surface);
+		        }
+		    }
+#else
+		    if (!handled) {
+		        if(type == Anvil::WindowGeneric::Type::Xcb) {
+		            VkXcbSurfaceCreateInfoKHR surface_create_info;
+
+		            surface_create_info.flags = 0;
+		            surface_create_info.window = generic_ptr->get_generic_handle().xcbWindow;
+		            surface_create_info.connection = static_cast<xcb_connection_t *>(window_ptr->get_connection());
+		            surface_create_info.pNext = nullptr;
+		            surface_create_info.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+
+		            result = instance_ptr->get_extension_khr_xcb_surface_entrypoints().vkCreateXcbSurfaceKHR(instance_ptr->get_instance_vk(), &surface_create_info, nullptr, /* pAllocator */
+                      &m_surface);
+		        }
+		        else if(type == Anvil::WindowGeneric::Type::Wayland) {
+		            auto vkInstance = instance_ptr->get_instance_vk();
+		            auto &entrypoints = instance_ptr->get_extension_khr_wayland_surface_entrypoints();
+		            VkWaylandSurfaceCreateInfoKHR surface_create_info;
+		            surface_create_info.flags = 0;
+		            surface_create_info.display = reinterpret_cast<wl_display *>(window_ptr->get_connection());
+		            surface_create_info.surface = reinterpret_cast<wl_surface *>(generic_ptr->get_generic_handle().waylandWindow);
+		            surface_create_info.pNext = nullptr;
+		            surface_create_info.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+		            result = entrypoints.vkCreateWaylandSurfaceKHR(vkInstance, &surface_create_info, nullptr, /* pAllocator */
+                      &m_surface);
+		        }
+		        else
+		            result = VK_ERROR_INITIALIZATION_FAILED;
+		    }
 		}
 #endif
 		else
