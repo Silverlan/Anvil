@@ -438,6 +438,7 @@ bool Anvil::RenderingSurface::init()
 				result = entrypoints.vkCreateWaylandSurfaceKHR(vkInstance, &surface_create_info, nullptr, /* pAllocator */
 				  &m_surface);
 			}
+#ifdef ANVIL_INCLUDE_HEADLESS_WINDOW_SYSTEM_SUPPORT
 		    else if (type == Anvil::WindowGeneric::Type::Windowless) {
 		        auto vkInstance = instance_ptr->get_instance_vk();
 		        auto &entrypoints = instance_ptr->get_extension_ext_headless_surface_entrypoints();
@@ -447,10 +448,11 @@ bool Anvil::RenderingSurface::init()
 		        surface_create_info.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
 		        result = entrypoints.vkCreateHeadlessSurfaceEXT(vkInstance, &surface_create_info, nullptr, &m_surface);
 		    }
+#endif
 			else
 				result = VK_ERROR_INITIALIZATION_FAILED;
-#endif
 		}
+#endif
 		else
 		{
 			#if defined(ANVIL_INCLUDE_WIN3264_WINDOW_SYSTEM_SUPPORT) && defined(_WIN32)
