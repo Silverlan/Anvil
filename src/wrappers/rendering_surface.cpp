@@ -457,8 +457,8 @@ bool Anvil::RenderingSurface::init()
 		        else
 		            result = VK_ERROR_INITIALIZATION_FAILED;
 		    }
-		}
 #endif
+		}
 		else
 		{
 			#if defined(ANVIL_INCLUDE_WIN3264_WINDOW_SYSTEM_SUPPORT) && defined(_WIN32)
