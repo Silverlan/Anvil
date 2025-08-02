@@ -406,7 +406,7 @@ bool Anvil::RenderingSurface::init()
 		        VkHeadlessSurfaceCreateInfoEXT surface_create_info;
 		        surface_create_info.flags = 0;
 		        surface_create_info.pNext = nullptr;
-		        surface_create_info.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+		        surface_create_info.sType = VK_STRUCTURE_TYPE_HEADLESS_SURFACE_CREATE_INFO_EXT;
 		        result = entrypoints.vkCreateHeadlessSurfaceEXT(vkInstance, &surface_create_info, nullptr, &m_surface);
 		        handled = true;
 		    }
