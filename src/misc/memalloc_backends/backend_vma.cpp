@@ -267,6 +267,8 @@ bool Anvil::MemoryAllocatorBackends::VMA::bake(Anvil::MemoryAllocator::Items& in
         {
             is_dedicated_alloc = (allocation->GetType() == VmaAllocation_T::ALLOCATION_TYPE_DEDICATED);
         }
+    	if (!current_item_ptr->debug_name.empty())
+    		vmaSetAllocationName(m_vma_allocator_ptr->get_handle(), allocation, current_item_ptr->debug_name.c_str());
 
         /* Bake the block and stash it */
         release_callback_function = std::bind(

@@ -70,6 +70,7 @@ namespace Anvil
             std::unique_ptr<uint32_t[]>                                                           buffer_ref_uint32_data_ptr;
             std::unique_ptr<std::vector<uint32_t>, std::function<void (std::vector<uint32_t>*)> > buffer_ref_uint32_vector_data_ptr;
             Anvil::Image*                                                                         image_ptr;
+            std::string debug_name;
 
             Anvil::MemoryAllocator* memory_allocator_ptr;
 

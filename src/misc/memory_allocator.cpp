@@ -523,6 +523,7 @@ bool Anvil::MemoryAllocator::add_buffer_internal(Anvil::Buffer*                 
     const VkMemoryRequirements memory_reqs              = in_buffer_ptr->get_memory_requirements();
     std::unique_ptr<Item>      new_item_ptr;
     bool                       result                   = true;
+	std::string                name;
 
     ANVIL_REDUNDANT_VARIABLE(backend_interface_ptr);
 
@@ -582,6 +583,9 @@ bool Anvil::MemoryAllocator::add_buffer_internal(Anvil::Buffer*                 
                  (in_opt_mgpu_bind_sparse_device_indices_ptr != nullptr) ? *in_opt_mgpu_bind_sparse_device_indices_ptr : MGPUBindSparseDeviceIndices(),
                  in_opt_memory_priority)
     );
+	name = in_buffer_ptr->get_name();
+	if (!name.empty())
+		new_item_ptr->debug_name = std::move(name);
 
     m_items.push_back(std::move(new_item_ptr));
 
@@ -979,6 +983,7 @@ bool Anvil::MemoryAllocator::add_image_whole(Anvil::Image*                      
     auto                                   mutex_ptr             = get_mutex();
     std::unique_ptr<Item>                  new_item_ptr;
     bool                                   result                = true;
+	std::string name;
 
     if (mutex_ptr != nullptr)
     {
@@ -1047,6 +1052,9 @@ bool Anvil::MemoryAllocator::add_image_whole(Anvil::Image*                      
                      in_opt_memory_priority,
                      n_plane)
         );
+    	name = in_image_ptr->get_name();
+    	if (!name.empty())
+    		new_item_ptr->debug_name = std::move(name);
 
         m_items.push_back(
             std::move(new_item_ptr)
@@ -1074,6 +1082,7 @@ bool Anvil::MemoryAllocator::add_sparse_buffer_region(Anvil::Buffer*            
     auto                                   mutex_ptr             = get_mutex();
     std::unique_ptr<Item>                  new_item_ptr;
     bool                                   result                = true;
+	std::string name;
 
     /* Sanity checks */
     anvil_assert(in_buffer_ptr                                    != nullptr);
@@ -1135,6 +1144,9 @@ bool Anvil::MemoryAllocator::add_sparse_buffer_region(Anvil::Buffer*            
                  (in_opt_mgpu_bind_sparse_device_indices_ptr != nullptr) ? *in_opt_mgpu_bind_sparse_device_indices_ptr : MGPUBindSparseDeviceIndices(),
                  in_opt_memory_priority)
     );
+	name = in_buffer_ptr->get_name();
+	if (!name.empty())
+		new_item_ptr->debug_name = std::move(name);
 
     m_items.push_back(
         std::move(new_item_ptr)
@@ -1170,6 +1182,7 @@ bool Anvil::MemoryAllocator::add_sparse_image_miptail(Anvil::Image*             
                                                                     : (in_aspect == Anvil::ImageAspectFlagBits::PLANE_2_BIT) ? 2
                                                                                                                              : 0;
     bool                                      result                = true;
+	std::string name;
 
     ANVIL_REDUNDANT_VARIABLE(result);
 
@@ -1248,6 +1261,9 @@ bool Anvil::MemoryAllocator::add_sparse_image_miptail(Anvil::Image*             
                  (in_opt_mgpu_bind_sparse_device_indices_ptr != nullptr) ? *in_opt_mgpu_bind_sparse_device_indices_ptr : MGPUBindSparseDeviceIndices(),
                  in_opt_memory_priority)
     );
+	name = in_image_ptr->get_name();
+	if (!name.empty())
+		new_item_ptr->debug_name = std::move(name);
 
     m_items.push_back(
         std::move(new_item_ptr)
@@ -1284,6 +1300,7 @@ bool Anvil::MemoryAllocator::add_sparse_image_subresource(Anvil::Image*         
     bool                                      result                     = true;
     const VkDeviceSize                        tile_size                  = in_image_ptr->get_image_alignment(n_plane);
     VkDeviceSize                              total_region_size_in_bytes = 0;
+	std::string name;
 
     ANVIL_REDUNDANT_VARIABLE(result);
 
@@ -1474,6 +1491,9 @@ bool Anvil::MemoryAllocator::add_sparse_image_subresource(Anvil::Image*         
                  (in_opt_mgpu_bind_sparse_device_indices_ptr != nullptr) ? *in_opt_mgpu_bind_sparse_device_indices_ptr : MGPUBindSparseDeviceIndices(),
                  in_opt_memory_priority)
     );
+	name = in_image_ptr->get_name();
+	if (!name.empty())
+		new_item_ptr->debug_name = std::move(name);
 
     m_items.push_back(
         std::move(new_item_ptr)

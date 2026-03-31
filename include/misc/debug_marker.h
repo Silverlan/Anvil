@@ -355,6 +355,17 @@ namespace Anvil
             }
         }
 
+        std::string get_name() const
+        {
+            if (m_worker_ptr != nullptr)
+            {
+                return m_worker_ptr->get_name();
+            }
+			if (m_delegate_workers.empty())
+				return {};
+			return m_delegate_workers.front()->get_name();
+        }
+
         /** Associates a user-specified tag data to with all maintained Vulkan object handles.
          *
          *  May be called more than once.
