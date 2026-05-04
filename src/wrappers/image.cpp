@@ -130,8 +130,19 @@ void Anvil::Image::change_image_layout(Anvil::Queue*                       in_qu
                                             this,
                                             in_subresource_range);
 
-        transition_command_buffer_ptr->record_pipeline_barrier(Anvil::PipelineStageFlagBits::ALL_COMMANDS_BIT,
-                                                               Anvil::PipelineStageFlagBits::ALL_COMMANDS_BIT,
+    	PipelineStageFlags src_stage_mask = PipelineStageFlagBits::ALL_COMMANDS_BIT;
+    	PipelineStageFlags dst_stage_mask = PipelineStageFlagBits::ALL_COMMANDS_BIT;
+
+    	if ((in_src_access_mask & AccessFlagBits::HOST_WRITE_BIT) != 0 ||
+			(in_src_access_mask & AccessFlagBits::HOST_READ_BIT)  != 0)
+    		src_stage_mask |= PipelineStageFlagBits::HOST_BIT;
+
+    	if ((in_dst_access_mask & AccessFlagBits::HOST_WRITE_BIT) != 0 ||
+			(in_dst_access_mask & AccessFlagBits::HOST_READ_BIT)  != 0)
+    		dst_stage_mask |= PipelineStageFlagBits::HOST_BIT;
+
+        transition_command_buffer_ptr->record_pipeline_barrier(src_stage_mask,
+                                                               dst_stage_mask,
                                                                Anvil::DependencyFlagBits::NONE,
                                                                0,              /* in_memory_barrier_count        */
                                                                nullptr,        /* in_memory_barrier_ptrs         */

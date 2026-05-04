@@ -260,6 +260,7 @@ namespace Anvil
         VkDeviceMemory                        m_memory;
         const Anvil::MemoryType*              m_memory_type_props_ptr; /* keep for simplified debugging */
         VkDeviceSize                          m_start_offset;
+        VkDeviceSize                          m_relative_start_offset;
 
         std::vector<const Anvil::PhysicalDevice*>           m_mgpu_physical_devices;
         std::shared_ptr<Anvil::IMemoryAllocatorBackendBase> m_owned_parent_memory_allocator_backend_ptr;

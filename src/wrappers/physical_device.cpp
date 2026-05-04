@@ -1412,12 +1412,12 @@ bool Anvil::PhysicalDevice::get_image_format_properties(const ImageFormatPropert
             texture_lod_gather_support_struct_id = output_struct_chainer.append_struct(texture_lod_gather_support);
         }
 
-        if (m_extension_info_ptr->get_device_extension_info()->ext_separate_stencil_usage() )
+        if (m_extension_info_ptr->get_device_extension_info()->ext_separate_stencil_usage() && in_query.stencil_usage_flags != Anvil::ImageUsageFlagBits::NONE )
         {
             VkImageStencilUsageCreateInfoEXT create_info;
 
             create_info.pNext        = nullptr;
-            create_info.stencilUsage = 0;
+            create_info.stencilUsage = in_query.stencil_usage_flags.get_vk();
             create_info.sType        = VK_STRUCTURE_TYPE_IMAGE_STENCIL_USAGE_CREATE_INFO_EXT;
 
             image_stencil_usage_create_info_struct_id = input_struct_chainer.append_struct(create_info);

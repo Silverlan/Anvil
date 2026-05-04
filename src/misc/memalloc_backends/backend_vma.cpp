@@ -455,3 +455,10 @@ void Anvil::MemoryAllocatorBackends::VMA::unmap(void* in_memory_object)
     vmaUnmapMemory(m_vma_allocator_ptr->get_handle(),
                    static_cast<VmaAllocation>(in_memory_object) );
 }
+
+std::optional<VkDeviceSize> Anvil::MemoryAllocatorBackends::VMA::get_underlying_allocation_size(void* in_memory_object)
+{
+	VmaAllocationInfo2 info2{};
+	vmaGetAllocationInfo2(m_vma_allocator_ptr->get_handle(), static_cast<VmaAllocation>(in_memory_object), &info2);
+	return info2.blockSize;
+}

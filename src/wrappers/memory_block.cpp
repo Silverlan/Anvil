@@ -46,10 +46,12 @@ Anvil::MemoryBlock::MemoryBlock(Anvil::MemoryBlockCreateInfoUniquePtr in_create_
 
     if (m_create_info_ptr->get_parent_memory_block() != nullptr)
     {
-        m_start_offset = m_create_info_ptr->get_start_offset() + m_create_info_ptr->get_parent_memory_block()->m_start_offset;
+    	m_relative_start_offset = m_create_info_ptr->get_parent_memory_block()->m_start_offset;
+        m_start_offset = m_create_info_ptr->get_start_offset() + m_relative_start_offset;
     }
     else
     {
+    	m_relative_start_offset = 0;
         m_start_offset = m_create_info_ptr->get_start_offset();
     }
 
@@ -597,7 +599,7 @@ bool Anvil::MemoryBlock::map(VkDeviceSize in_start_offset,
     /* Sanity checks */
     if (m_create_info_ptr->get_parent_memory_block() != nullptr)
     {
-        result = m_create_info_ptr->get_parent_memory_block()->map(m_start_offset + in_start_offset,
+        result = m_create_info_ptr->get_parent_memory_block()->map(m_relative_start_offset + in_start_offset,
                                                                    in_size,
                                                                    out_opt_data_ptr);
     }
@@ -736,7 +738,7 @@ bool Anvil::MemoryBlock::read(VkDeviceSize in_start_offset,
 
     if (m_create_info_ptr->get_parent_memory_block() != nullptr)
     {
-        result = m_create_info_ptr->get_parent_memory_block()->read(m_start_offset + in_start_offset,
+        result = m_create_info_ptr->get_parent_memory_block()->read(m_relative_start_offset + in_start_offset,
                                                                     in_size,
                                                                     out_result_ptr);
     }
@@ -767,10 +769,21 @@ bool Anvil::MemoryBlock::read(VkDeviceSize in_start_offset,
                                                                 non_coherent_atom_size);
             mapped_memory_range.sType  = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
 
-            if (mapped_memory_range.size + mapped_memory_range.offset > mem_block_size)
-            {
-                mapped_memory_range.size = mem_block_size - mapped_memory_range.offset;
-            }
+        	if(m_parent_memory_allocator_backend_ptr) {
+        		auto underlyingSize = m_parent_memory_allocator_backend_ptr->get_underlying_allocation_size(m_backend_object);
+        		if (underlyingSize && mapped_memory_range.size + mapped_memory_range.offset > *underlyingSize)
+        			mapped_memory_range.size = *underlyingSize - mapped_memory_range.offset;
+        	}
+        	else if (mapped_memory_range.size + mapped_memory_range.offset > mem_block_size)
+        		mapped_memory_range.size = mem_block_size - mapped_memory_range.offset;
+
+        	if(m_parent_memory_allocator_backend_ptr) {
+        		auto underlyingSize = m_parent_memory_allocator_backend_ptr->get_underlying_allocation_size(m_backend_object);
+        		if (underlyingSize && mapped_memory_range.size + mapped_memory_range.offset > *underlyingSize)
+        			mapped_memory_range.size = *underlyingSize - mapped_memory_range.offset;
+        	}
+            else if (mapped_memory_range.size + mapped_memory_range.offset > mem_block_size)
+            	mapped_memory_range.size = mem_block_size - mapped_memory_range.offset;
 
             result_vk = Anvil::Vulkan::vkInvalidateMappedMemoryRanges(m_create_info_ptr->get_device()->get_device_vk(),
                                                                       1, /* memRangeCount */
@@ -833,7 +846,7 @@ bool Anvil::MemoryBlock::write(VkDeviceSize in_start_offset,
 
     if (m_create_info_ptr->get_parent_memory_block() != nullptr)
     {
-        result = m_create_info_ptr->get_parent_memory_block()->write(m_start_offset + in_start_offset,
+        result = m_create_info_ptr->get_parent_memory_block()->write(m_relative_start_offset + in_start_offset,
                                                                      in_size,
                                                                      in_data);
     }
@@ -865,10 +878,13 @@ bool Anvil::MemoryBlock::write(VkDeviceSize in_start_offset,
                                                                 non_coherent_atom_size);
             mapped_memory_range.sType  = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
 
-            if (mapped_memory_range.size + mapped_memory_range.offset > mem_block_size)
-            {
-                mapped_memory_range.size = mem_block_size - mapped_memory_range.offset;
-            }
+        	if(m_parent_memory_allocator_backend_ptr) {
+        		auto underlyingSize = m_parent_memory_allocator_backend_ptr->get_underlying_allocation_size(m_backend_object);
+        		if (underlyingSize && mapped_memory_range.size + mapped_memory_range.offset > *underlyingSize)
+        			mapped_memory_range.size = *underlyingSize - mapped_memory_range.offset;
+        	}
+        	else if (mapped_memory_range.size + mapped_memory_range.offset > mem_block_size)
+        		mapped_memory_range.size = mem_block_size - mapped_memory_range.offset;
 
             result_vk = Anvil::Vulkan::vkFlushMappedMemoryRanges(m_create_info_ptr->get_device()->get_device_vk(),
                                                                  1, /* memRangeCount */

@@ -1415,7 +1415,8 @@ namespace Anvil
              format                     (in_format),
              image_type                 (in_image_type),
              tiling                     (in_tiling),
-             usage_flags                (in_usage_flags)
+             usage_flags                (in_usage_flags),
+    	     stencil_usage_flags        (Anvil::ImageUsageFlagBits::NONE)
         {
             /* Stub */
         }
@@ -1431,6 +1432,7 @@ namespace Anvil
         const Anvil::ImageType                  image_type;
         const Anvil::ImageTiling                tiling;
         const Anvil::ImageUsageFlags            usage_flags;
+    	const Anvil::ImageUsageFlags            stencil_usage_flags;
 
         ImageFormatPropertiesQuery           (const ImageFormatPropertiesQuery& in_query) = default;
         ImageFormatPropertiesQuery& operator=(const ImageFormatPropertiesQuery& in_query) = delete;

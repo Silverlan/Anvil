@@ -23,6 +23,7 @@
 #define TYPES_CLASSES_H
 
 #include "misc/types_struct.h"
+#include <optional>
 
 namespace Anvil
 {
@@ -41,6 +42,7 @@ namespace Anvil
                                          void**       out_result_ptr)   = 0;
         virtual bool     supports_baking() const                        = 0;
         virtual void     unmap          (void*        in_memory_object) = 0;
+    	virtual std::optional<VkDeviceSize> get_underlying_allocation_size(void* in_memory_object) = 0;
     };
 
     /** Container for sparse memory binding updates */

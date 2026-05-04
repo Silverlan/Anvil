@@ -72,6 +72,7 @@ namespace Anvil
             bool     supports_device_masks           ()                                                                            const final;
             bool     supports_protected_memory       ()                                                                            const final;
             void     unmap                           (void*                                       in_memory_object) final;
+        	std::optional<VkDeviceSize> get_underlying_allocation_size(void* in_memory_object) final {return {};}
 
             /* Private functions */
 

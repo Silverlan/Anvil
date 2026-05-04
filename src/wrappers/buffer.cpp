@@ -1181,8 +1181,7 @@ bool Anvil::Buffer::write(VkDeviceSize  in_start_offset,
         }
         {
             BufferBarrier        buffer_barrier(Anvil::AccessFlagBits::HOST_WRITE_BIT, /* in_source_access_mask */
-                                                (Anvil::AccessFlagBits::HOST_READ_BIT  | Anvil::AccessFlagBits::MEMORY_READ_BIT  | Anvil::AccessFlagBits::SHADER_READ_BIT  | Anvil::AccessFlagBits::TRANSFER_READ_BIT   |
-                                                 Anvil::AccessFlagBits::HOST_WRITE_BIT | Anvil::AccessFlagBits::MEMORY_WRITE_BIT | Anvil::AccessFlagBits::SHADER_WRITE_BIT | Anvil::AccessFlagBits::TRANSFER_WRITE_BIT),
+                                                Anvil::AccessFlagBits::TRANSFER_READ_BIT,
                                                 VK_QUEUE_FAMILY_IGNORED,
                                                 VK_QUEUE_FAMILY_IGNORED,
                                                 m_staging_buffer_ptr.get(),
