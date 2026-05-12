@@ -833,6 +833,18 @@ end:
     return result;
 }
 
+void *Anvil::MemoryBlock::get_gpu_data_ptr()
+{
+	auto *parent = m_create_info_ptr->get_parent_memory_block();
+	while(parent != nullptr) {
+		auto *parentOfParent = parent->m_create_info_ptr->get_parent_memory_block();
+		if(!parentOfParent)
+			return static_cast<uint8_t*>(parent->m_gpu_data_ptr) + m_start_offset;
+		parent = parentOfParent;
+	}
+	return static_cast<uint8_t*>(m_gpu_data_ptr) + m_start_offset;
+}
+
 /* Please see header for specification */
 bool Anvil::MemoryBlock::write(VkDeviceSize in_start_offset,
                                VkDeviceSize in_size,

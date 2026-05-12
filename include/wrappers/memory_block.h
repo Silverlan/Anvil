@@ -203,6 +203,8 @@ namespace Anvil
                    VkDeviceSize in_size,
                    const void*  in_data);
 
+    	void *get_gpu_data_ptr();
+
     private:
         /* Private functions */
 
