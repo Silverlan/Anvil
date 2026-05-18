@@ -95,7 +95,6 @@ Anvil::BaseDevice::~BaseDevice()
 
 /** TODO */
 void Anvil::BaseDevice::create_device(const std::vector<const char*>& in_extensions,
-                                      const std::vector<const char*>& in_layers,
                                       DeviceQueueFamilyInfo*          out_queue_families_ptr)
 {
     std::vector<float>                       device_queue_priorities;
@@ -123,12 +122,12 @@ void Anvil::BaseDevice::create_device(const std::vector<const char*>& in_extensi
             VkDeviceCreateInfo create_info;
 
             create_info.enabledExtensionCount   = static_cast<uint32_t>(in_extensions.size() );
-            create_info.enabledLayerCount       = static_cast<uint32_t>(in_layers.size    () );
+            create_info.enabledLayerCount       = 0;
             create_info.flags                   = 0;
             create_info.pNext                   = nullptr;
             create_info.pEnabledFeatures        = nullptr; /* chained */
             create_info.ppEnabledExtensionNames = (in_extensions.size() > 0) ? &in_extensions[0] : nullptr;
-            create_info.ppEnabledLayerNames     = (in_layers.size    () > 0) ? &in_layers    [0] : nullptr;
+            create_info.ppEnabledLayerNames     = nullptr;
             create_info.pQueueCreateInfos       = nullptr; /* chained later */
             create_info.queueCreateInfoCount    = 0;       /* filled later  */
             create_info.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -921,25 +920,8 @@ bool Anvil::BaseDevice::init()
 
     std::map<std::string, bool> extensions_final_enabled_status;
     const bool                  is_validation_enabled(parent_instance_ptr->is_validation_enabled() );
-    std::vector<const char*>    layers_final;
     const auto                  mt_safety            (Anvil::Utils::convert_boolean_to_mt_safety_enum(is_mt_safe()) );
     bool                        result               (false);
-
-    /* If validation is enabled, retrieve names of all suported validation layers and
-     * append them to the list of layers the user has alreaedy specified. **/
-    for (auto current_layer : m_create_info_ptr->get_layers_to_enable() )
-    {
-        layers_final.push_back(current_layer.c_str() );
-    }
-
-    if (is_validation_enabled)
-    {
-        // anvil_assert(is_layer_supported("VK_LAYER_KHRONOS_validation") );
-        if (is_layer_supported("VK_LAYER_KHRONOS_validation") )
-        {
-            layers_final.push_back("VK_LAYER_KHRONOS_validation");
-        }
-    }
 
     /* Go through the extension struct, verify availability of the requested extensions,
      * and cache the ones that have been requested and which are available in a vector. */
@@ -1032,7 +1014,6 @@ bool Anvil::BaseDevice::init()
                 }
 
                 create_device(extension_name_raw_ptrs,
-                              layers_final,
                              &m_device_queue_families);
             }
             anvil_assert(m_device != VK_NULL_HANDLE);

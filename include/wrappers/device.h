@@ -705,7 +705,6 @@ namespace Anvil
         void add_physical_device_features_to_chainer(Anvil::StructChainer<VkDeviceCreateInfo>* in_struct_chainer) const;
 
         void create_device(const std::vector<const char*>& in_extensions,
-                           const std::vector<const char*>& in_layers,
                            DeviceQueueFamilyInfo*          out_queue_families_ptr);
 
         std::vector<float> get_queue_priorities(const QueueFamilyInfo* in_queue_family_info_ptr) const;
